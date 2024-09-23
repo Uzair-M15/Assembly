@@ -1,3 +1,6 @@
+extern memory.storeReg
+extern memory.restoreReg
+
 section .data
     bebx dd 0
     becx dd 0
@@ -12,17 +15,11 @@ section .text
     global split
 
 
-storeReg:
-    mov [bebx],ebx          ;Sotre initial register value
-    mov [becx],ecx
-    mov [bedx],edx
-    ret
-
 
 ;Region Length methods
 
-Length:
-    call storeReg
+strings.Length:
+    call memory.storeReg
     push ebp
     mov ebp,esp             ;Set the pointer to the base point
     mov ebx,[ebp+8]         ;Get the address of the string
@@ -32,17 +29,15 @@ Length:
 LengthLoop:
     mov al,[ebx+ecx]        ;Read the character
     cmp al,0                ;Check if the current character is the string termination character
-    je LengthLoopEnd              ;If current character is termination character then end the loop
+    je LengthLoopEnd        ;If current character is termination character then end the loop
     inc ecx                 ;If it isnt the termination character then increment the character
-    jmp LengthLoop                ;Go back to the beginning of the loop
+    jmp LengthLoop          ;Go back to the beginning of the loop
 
 LengthLoopEnd:
     mov eax,ecx
     pop ebx
     
-    mov ebx,[bebx]          ;restore the non return registers to their original value
-    mov ecx,[becx]
-    mov edx,[bedx]
+    call memory.restoreReg
     
     ret                     ;Remove base pointer from stack
 
@@ -58,8 +53,8 @@ LengthLoopEnd:
 
 
 ;Region Index Methods
-index:
-    call storeReg
+strings.index:
+    call memory.storeReg
     push ebp
     mov ebp,esp
     
@@ -83,18 +78,14 @@ IndexFound:
     mov al,[ecx+ebx]
     movzx eax,al
     
-    mov ebx,[bebx]
-    mov ecx,[becx]
-    mov edx,[bedx]
+    call memory.restoreReg
     
     ret
 
 IndexNotFound:
     mov eax,-1
     
-    mov ebx,[bebx]
-    mov ecx,[becx]
-    mov edx,[bedx]
+    call memory.restoreReg
     
     ret
     
